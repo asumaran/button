@@ -3,6 +3,7 @@
   var pluginName = 'button';
   var storageName = 'plugin_' + pluginName;
   var defaults = {
+    activeClass: 'active',
     onActivate: function () {},
     onDeactivate: function () {}
   };
@@ -43,14 +44,14 @@
       }
     },
     isActive: function () {
-      return this.$element.hasClass('active');
+      return this.$element.hasClass(this.$options.activeClass);
     },
     activate: function () {
-      this.$element.addClass('active');
+      this.$element.addClass(this.$options.activeClass);
       this.$options.onActivate.call(this);
     },
     deactivate: function () {
-      this.$element.removeClass('active');
+      this.$element.removeClass(this.$options.activeClass);
       this.$options.onDeactivate.call(this);
     }
 
