@@ -37,10 +37,32 @@
 
     },
     click: function () {
-      if (this.isActive()) {
-        this.$element.trigger('deactivate');
-      } else {
+
+      $elementData = this.$element.data('button');
+
+      // Si el elemento actual se debe comportar como "radio button"
+      // entonces desactivamos los demás elementos que tengan el selector común
+      if ($elementData && $elementData.behaviour === 'radiobutton') {
+
+        // TODO: Hacer que los radiobutton tambien escuchen eventos y puedan
+        // y puedan actualizar el estado del botón si es que son "checados" dinámicamente
         this.$element.trigger('activate');
+
+        // Deseleccionamos todos los radiobutton del grupo
+        $($elementData.groupClass).not(this.$element).trigger('deactivate');
+
+        // Seleccionamos el radio button correspondiente
+        $($elementData.checkboxEl).removeAttr('checked');
+        $($elementData.checkboxEl + '[value="' + $elementData.checkboxValue + '"]').prop({
+          'checked': true
+        });
+
+      } else {
+        if (this.isActive()) {
+          this.$element.trigger('deactivate');
+        } else {
+          this.$element.trigger('activate');
+        }
       }
     },
     isActive: function () {

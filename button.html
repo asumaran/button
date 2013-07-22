@@ -11,7 +11,22 @@
 </head>
 
 <body>
+  
+  <h2>Single Button</h2>
+
   <a id="btn1" href="#" class="btn">Botón</a>
+  
+  <h3>Radio Button Behaviour</h3>
+  
+  <p>
+    <a href="#" class="btn btn-options" data-button='{"behaviour": "radiobutton", "groupClass" : ".btn-options", "checkboxEl": "input[name=\"checkbox_test\"]", "checkboxValue":"opt_1"}'>Option 1</a>
+    <input type="radio" name="checkbox_test" value="opt_1"><br><br>
+    <a href="#" class="btn btn-options" data-button='{"behaviour": "radiobutton", "groupClass" : ".btn-options", "checkboxEl": "input[name=\"checkbox_test\"]", "checkboxValue":"opt_2"}'>Option 2</a>
+    <input type="radio" name="checkbox_test" value="opt_2"><br><br>
+    <a href="#" class="btn btn-options" data-button='{"behaviour": "radiobutton", "groupClass" : ".btn-options", "checkboxEl": "input[name=\"checkbox_test\"]", "checkboxValue":"opt_3"}'>Option 3</a>
+    <input type="radio" name="checkbox_test" value="opt_3">
+  </p>
+
 </body>
 
 </html>
