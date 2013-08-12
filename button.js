@@ -49,11 +49,11 @@
         this.$element.trigger('activate');
 
         // Deseleccionamos todos los radiobutton del grupo
-        $($elementData.groupClass).not(this.$element).trigger('deactivate');
+        $($elementData.group).not(this.$element).trigger('deactivate');
 
         // Seleccionamos el radio button correspondiente
-        $($elementData.checkboxEl).removeAttr('checked');
-        $($elementData.checkboxEl + '[value="' + $elementData.checkboxValue + '"]').prop({
+        $($elementData.input).removeAttr('checked');
+        $($elementData.input + '[value="' + $elementData.value + '"]').prop({
           'checked': true
         });
 
