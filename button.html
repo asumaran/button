@@ -14,18 +14,30 @@
   
   <h2>Single Button</h2>
 
-  <a id="btn1" href="#" class="btn">Botón</a>
+  <a id="btn1" href="#" class="btn btn-single">Botón</a>
   
-  <h3>Radio Button Behaviour</h3>
+  <h3>Radio Button Behaviour (Unique option)</h3>
   
   <p>
-    <a href="#" class="btn btn-options" data-button='{"behaviour": "radiobutton", "groupClass" : ".btn-options", "checkboxEl": "input[name=\"checkbox_test\"]", "checkboxValue":"opt_1"}'>Option 1</a>
-    <input type="radio" name="checkbox_test" value="opt_1"><br><br>
-    <a href="#" class="btn btn-options" data-button='{"behaviour": "radiobutton", "groupClass" : ".btn-options", "checkboxEl": "input[name=\"checkbox_test\"]", "checkboxValue":"opt_2"}'>Option 2</a>
-    <input type="radio" name="checkbox_test" value="opt_2"><br><br>
-    <a href="#" class="btn btn-options" data-button='{"behaviour": "radiobutton", "groupClass" : ".btn-options", "checkboxEl": "input[name=\"checkbox_test\"]", "checkboxValue":"opt_3"}'>Option 3</a>
-    <input type="radio" name="checkbox_test" value="opt_3">
+    <a href="#" class="btn btn-unique" data-button='{"behaviour": "radiobutton", "group" : ".btn-unique", "input": "input[name=\"checkbox-test-unique\"]", "value":"opt_1"}'>Option 1</a>
+    <input type="radio" name="checkbox-test-unique" value="opt_1"><br><br>
+    <a href="#" class="btn btn-unique" data-button='{"behaviour": "radiobutton", "group" : ".btn-unique", "input": "input[name=\"checkbox-test-unique\"]", "value":"opt_2"}'>Option 2</a>
+    <input type="radio" name="checkbox-test-unique" value="opt_2"><br><br>
+    <a href="#" class="btn btn-unique" data-button='{"behaviour": "radiobutton", "group" : ".btn-unique", "input": "input[name=\"checkbox-test-unique\"]", "value":"opt_3"}'>Option 3</a>
+    <input type="radio" name="checkbox-test-unique" value="opt_3">
   </p>
+
+  <h3>Checkbox Button Behaviour (Multiple option)</h3>
+  <p>
+    <a href="#" class="btn btn-multiple" data-button='{"behaviour": "checkbox", "group" : ".btn-multiple", "input": "input[name=\"checkbox-test-multiple\"]", "value":"opt_1"}'>Option 1</a>
+    <input type="checkbox" name="checkbox-test-multiple" value="opt_1"><br><br>
+    <a href="#" class="btn btn-multiple" data-button='{"behaviour": "checkbox", "group" : ".btn-multiple", "input": "input[name=\"checkbox-test-multiple\"]", "value":"opt_2"}'>Option 2</a>
+    <input type="checkbox" name="checkbox-test-multiple" value="opt_2"><br><br>
+    <a href="#" class="btn btn-multiple" data-button='{"behaviour": "checkbox", "group" : ".btn-multiple", "input": "input[name=\"checkbox-test-multiple\"]", "value":"opt_3"}'>Option 3</a>
+    <input type="checkbox" name="checkbox-test-multiple" value="opt_3">
+  </p>
+
+
 
 </body>
 
