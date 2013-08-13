@@ -29,6 +29,7 @@
       var self = this;
 
       this.$element.on('click.' + pluginName, function (e) {
+        e.preventDefault();
         self.click();
       });
 
