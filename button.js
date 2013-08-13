@@ -16,9 +16,30 @@
 
   // Constructor
   var Button = function (element, options) {
-    this.$element = $(element);
-    this.$options = $.extend({}, defaults, options);
-    this.init();
+    
+    var self = this;
+
+    self.$element = $(element);
+    self.$elementData = self.$element.data('button');
+    self.$group = self.$elementData ? $(self.$elementData.group) : [];
+    self.$options = $.extend({}, defaults, options);
+    self.init();
+
+    function option (key, val){
+      if (val) {
+        self.$options[key] = val;
+      } else if(self.$options[key]) {
+        return self.$options[key];
+      }else if(self[key]){
+        // Solo lectura
+        return self[key];
+      }
+    }
+
+    return {
+      option: option
+    };
+
   };
 
   Button.prototype = {
@@ -134,39 +155,44 @@
 
   $.fn[pluginName] = function (options) {
 
-    return this.each(function () {
-
-      // Obtenemos instancia del elemento actual si es que la hay
-      // para ser usado en las validaciones que siguen
-      var pluginInstance = $.data(this, storageName);
-      // Definimos lo que queremos ejecutar
-      if (typeof options === 'object' || options === 'init' || !options) {
-        // Este caso será para cuando se llame al plugin o se llame al método init 
-        // o cuando realmente se esté pasando un objeto que serán los defaults
-
-        // Prevenimos multiple instancias
-        if (!$.data(this, "plugin_" + pluginName)) {
-          // Si no tiene definida la propiedad entonces quiere decir
-          // que no ha sido inicializado el plugin en este elemento
-          // entonces creamos la propiedad y inicializamos el plugin en este elemento
-          $.data(this, "plugin_" + pluginName, new Button(this, options));
+    // Plugin definition based on
+    // http://f6design.com/journal/2012/05/06/a-jquery-plugin-boilerplate/
+    // If the first parameter is a string, treat this as a call to
+    // a public method.
+    if (typeof arguments[0] === 'string') {
+      var methodName = arguments[0];
+      var args = Array.prototype.slice.call(arguments, 1);
+      var returnVal;
+      this.each(function () {
+        // Check that the element has a plugin instance, and that
+        // the requested public method exists.
+        if ($.data(this, storageName) && typeof $.data(this, storageName)[methodName] === 'function') {
+          // Call the method of the Plugin instance, and Pass it
+          // the supplied arguments.
+          returnVal = $.data(this, storageName)[methodName].apply(this, args);
         } else {
-          $.error('Plugin is already initialized for this object.');
-          return;
+          throw new Error('Method ' + methodName + ' does not exist on jQuery.' + pluginName);
         }
-      } else if (pluginInstance[options]) {
-        // Este caso será si es que se está tratando de llamar un método directamente del plugin
-        var method = options;
-
-        // El primer argumento fue el nombre del método
-        options = Array.prototype.slice.call(arguments, 1);
-
-        // Ejecutamos el método
-        pluginInstance[method](options);
+      });
+      if (returnVal !== undefined) {
+        // If the method returned a value, return the value.
+        return returnVal;
       } else {
-        $.error('Method ' + options + ' does not exist on jQuery.' + pluginName + '.');
-        return;
+        // Otherwise, returning 'this' preserves chainability.
+        return this;
       }
-    });
-  }
+      // If the first parameter is an object (options), or was omitted,
+      // instantiate a new instance of the plugin.
+    } else if (typeof options === "object" || !options) {
+      return this.each(function () {
+        // Only allow the plugin to be instantiated once.
+        if (!$.data(this, storageName)) {
+          // Pass options to Plugin constructor, and store Plugin
+          // instance in the elements jQuery data object.
+          $.data(this, storageName, new Button(this, options));
+        }
+      });
+    }
+  };
+  
 })(jQuery);
