@@ -9,6 +9,7 @@
   var defaults = {
     activeClass: 'active',
     behaviour: 'single',
+    beforeActivate: function () {},
     onActivate: function () {},
     onDeactivate: function () {}
   };
@@ -75,6 +76,9 @@
     },
     activate: function () {
       console.log('Activate method');
+      
+      // Ejecutamos before activate
+      this.$options.beforeActivate.call(this);
 
       var $elementData = this.$element.data('button');
       var behaviour = ($elementData && $elementData.behaviour) ? $elementData.behaviour : 'single';
