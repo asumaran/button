@@ -1,9 +1,14 @@
+// TODO: 
+// * Hacer que los radiobutton tambien escuchen eventos y puedan
+// * y puedan actualizar el estado del botón si es que son "checados" dinámicamente
+
 ;(function ($, undefined) {
 
   var pluginName = 'button';
   var storageName = 'plugin_' + pluginName;
   var defaults = {
     activeClass: 'active',
+    behaviour: 'single',
     onActivate: function () {},
     onDeactivate: function () {}
   };
@@ -38,42 +43,85 @@
     },
     click: function () {
 
-      $elementData = this.$element.data('button');
+      var $elementData = this.$element.data('button');
+      var behaviour = ($elementData && $elementData.behaviour) ? $elementData.behaviour : 'single';
 
-      // Si el elemento actual se debe comportar como "radio button"
-      // entonces desactivamos los demás elementos que tengan el selector común
-      if ($elementData && $elementData.behaviour === 'radiobutton') {
+      switch(behaviour) {
+        case 'radiobutton':
+          console.log('radiobutton case');
 
-        // TODO: Hacer que los radiobutton tambien escuchen eventos y puedan
-        // y puedan actualizar el estado del botón si es que son "checados" dinámicamente
-        this.$element.trigger('activate');
+          // Deseleccionamos todos los demás radiobutton del grupo
+          $($elementData.group).not(this.$element).trigger('deactivate');
 
-        // Deseleccionamos todos los radiobutton del grupo
-        $($elementData.group).not(this.$element).trigger('deactivate');
-
-        // Seleccionamos el radio button correspondiente
-        $($elementData.input).removeAttr('checked');
-        $($elementData.input + '[value="' + $elementData.value + '"]').prop({
-          'checked': true
-        });
-
-      } else {
-        if (this.isActive()) {
-          this.$element.trigger('deactivate');
-        } else {
+          // Activamos al que se le hizo click
           this.$element.trigger('activate');
-        }
+          break;
+        case 'checkbox':
+        case 'single':
+          console.log('checkbox case');
+          if(this.isActive()){
+            console.log('trigger: Deactivate');
+            this.$element.trigger('deactivate');
+          }else{
+            console.log('trigger: Activate');
+            this.$element.trigger('activate');
+          }
+          break;
       }
     },
     isActive: function () {
       return this.$element.hasClass(this.$options.activeClass);
     },
     activate: function () {
+      console.log('Activate method');
+
+      var $elementData = this.$element.data('button');
+      var behaviour = ($elementData && $elementData.behaviour) ? $elementData.behaviour : 'single';
+
+      // Manejamos los input relacionados
+      if( behaviour == 'radiobutton' ){
+
+        // Radiobutton
+        // Seleccionamos el radio button correspondiente
+        $($elementData.input).removeAttr('checked');
+        $($elementData.input + '[value="' + $elementData.value + '"]').prop({
+          'checked': true
+        });
+
+      }else if( behaviour == 'checkbox'  ){
+
+        // Checkbox
+        $($elementData.input + '[value="' + $elementData.value + '"]').prop({
+          'checked': true
+        });
+      }
+      
+      // Añadimos clase para estado
       this.$element.addClass(this.$options.activeClass);
+
+      // Ejecutamos callback
       this.$options.onActivate.call(this);
     },
     deactivate: function () {
+      console.log('Deactivate method');
+
+      var $elementData = this.$element.data('button');
+      var behaviour = ($elementData && $elementData.behaviour) ? $elementData.behaviour : 'single';
+      
+      if( behaviour == 'radiobutton' ){
+        $($elementData.input + '[value="' + $elementData.value + '"]').removeAttr('checked');
+      }else if(  behaviour == 'checkbox' ){
+
+        // Quitamos check
+        $($elementData.input + '[value="' + $elementData.value + '"]').prop({
+          checked: false
+        });
+      }
+
+      // Añadimos clase para estado
       this.$element.removeClass(this.$options.activeClass);
+
+      // Ejecutamos callback
       this.$options.onDeactivate.call(this);
     }
 
