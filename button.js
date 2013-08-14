@@ -64,8 +64,14 @@
     },
     click: function () {
 
-      var $elementData = this.$element.data('button');
+      var pluginInstance = (this instanceof Button) ? this : $(this).data(storageName);
+      var thisInstance = (this instanceof HTMLElement) ? $(this) : this.$element;
+
+      if(thisInstance.data('status') === 'disabled') return;
+
+      var $elementData = pluginInstance.$element.data('button');
       var behaviour = ($elementData && $elementData.behaviour) ? $elementData.behaviour : 'single';
+
 
       switch(behaviour) {
         case 'radiobutton':
@@ -75,17 +81,17 @@
           $($elementData.group).not(this.$element).trigger('deactivate.'+pluginName);
 
           // Activamos al que se le hizo click
-          this.$element.trigger('activate');
+          pluginInstance.$element.trigger('activate');
           break;
         case 'checkbox':
         case 'single':
           console.log('checkbox case');
-          if(this.isActive()){
+          if(pluginInstance.isActive()){
             console.log('trigger: Deactivate');
-            this.$element.trigger('deactivate.'+pluginName);
+            pluginInstance.$element.trigger('deactivate.'+pluginName);
           }else{
             console.log('trigger: Activate');
-            this.$element.trigger('activate');
+            pluginInstance.$element.trigger('activate');
           }
           break;
       }
@@ -120,10 +126,11 @@
         // Quitamos clase de estado para los demás elementos del grupo
         // Note: Quizá debería ser más específico el selector aquí y no
         // quitar la clase para el elemento actual
-        pluginInstance.$group.removeClass(pluginInstance.$options.activeClass);
+        // OJO: No tocamos los elementos deshabilitados
+        pluginInstance.$group.not('.disabled').removeClass(pluginInstance.$options.activeClass);
         
         // Lo mismo para el grupo, quitamos la data de activo
-        pluginInstance.$group.removeData('status');
+        pluginInstance.$group.not('.disabled').removeData('status');
 
       }else if( behaviour == 'checkbox'  ){
 
