@@ -8,6 +8,7 @@
   var storageName = 'plugin_' + pluginName;
   var defaults = {
     activeClass: 'active',
+    disableClass: 'disabled',
     behaviour: 'single',
     beforeActivate: function () {},
     onActivate: function () {},
@@ -25,21 +26,16 @@
     self.$options = $.extend({}, defaults, options);
     self.init();
 
-    function option (key, val){
-      if (val) {
-        self.$options[key] = val;
-      } else if(self.$options[key]) {
-        return self.$options[key];
-      }else if(self[key]){
-        // Solo lectura
-        return self[key];
-      }
-    }
-
-    return {
-      option: option
-    };
-
+    // function option (key, val){
+    //   if (val) {
+    //     self.$options[key] = val;
+    //   } else if(self.$options[key]) {
+    //     return self.$options[key];
+    //   }else if(self[key]){
+    //     // Solo lectura
+    //     return self[key];
+    //   }
+    // }
   };
 
   Button.prototype = {
@@ -56,10 +52,12 @@
       });
 
       this.$element.on('activate.' + pluginName, function (e) {
+        e.preventDefault();
         self.activate();
       });
 
       this.$element.on('deactivate.' + pluginName, function (e) {
+        e.preventDefault();
         self.deactivate();
       });
 
@@ -74,7 +72,7 @@
           console.log('radiobutton case');
 
           // Deseleccionamos todos los demás radiobutton del grupo
-          $($elementData.group).not(this.$element).trigger('deactivate');
+          $($elementData.group).not(this.$element).trigger('deactivate.'+pluginName);
 
           // Activamos al que se le hizo click
           this.$element.trigger('activate');
@@ -84,7 +82,7 @@
           console.log('checkbox case');
           if(this.isActive()){
             console.log('trigger: Deactivate');
-            this.$element.trigger('deactivate');
+            this.$element.trigger('deactivate.'+pluginName);
           }else{
             console.log('trigger: Activate');
             this.$element.trigger('activate');
@@ -96,23 +94,36 @@
       return this.$element.hasClass(this.$options.activeClass);
     },
     activate: function () {
-      console.log('Activate method');
-      
-      // Ejecutamos before activate
-      this.$options.beforeActivate.call(this);
 
-      var $elementData = this.$element.data('button');
+      var pluginInstance = (this instanceof Button) ? this : $(this).data(storageName);
+      var thisInstance = (this instanceof HTMLElement) ? $(this) : this.$element;
+
+      if(thisInstance.data('status') === 'disabled') return;
+
+      console.log('Activate method');
+
+      // Ejecutamos before activate
+      pluginInstance.$options.beforeActivate.call(this);
+
+      var $elementData = pluginInstance.$element.data('button');
       var behaviour = ($elementData && $elementData.behaviour) ? $elementData.behaviour : 'single';
 
       // Manejamos los input relacionados
       if( behaviour == 'radiobutton' ){
 
-        // Radiobutton
         // Seleccionamos el radio button correspondiente
         $($elementData.input).removeAttr('checked');
         $($elementData.input + '[value="' + $elementData.value + '"]').prop({
           'checked': true
         });
+
+        // Quitamos clase de estado para los demás elementos del grupo
+        // Note: Quizá debería ser más específico el selector aquí y no
+        // quitar la clase para el elemento actual
+        pluginInstance.$group.removeClass(pluginInstance.$options.activeClass);
+        
+        // Lo mismo para el grupo, quitamos la data de activo
+        pluginInstance.$group.removeData('status');
 
       }else if( behaviour == 'checkbox'  ){
 
@@ -121,34 +132,83 @@
           'checked': true
         });
       }
-      
+
+
       // Añadimos clase para estado
-      this.$element.addClass(this.$options.activeClass);
+      pluginInstance.$element.addClass(pluginInstance.$options.activeClass);
+
+      // Añadimos estado al elemento
+      thisInstance.data('status', 'active');
 
       // Ejecutamos callback
-      this.$options.onActivate.call(this);
+      pluginInstance.$options.onActivate.call(pluginInstance);
     },
     deactivate: function () {
+
+      var pluginInstance = (this instanceof Button) ? this : $(this).data(storageName);
+      var thisInstance = (this instanceof HTMLElement) ? $(this) : this.$element;
+
+      if(thisInstance.data('status') === 'disabled') return;
+
       console.log('Deactivate method');
 
-      var $elementData = this.$element.data('button');
+      var $elementData = pluginInstance.$element.data('button');
       var behaviour = ($elementData && $elementData.behaviour) ? $elementData.behaviour : 'single';
-      
+
       if( behaviour == 'radiobutton' ){
         $($elementData.input + '[value="' + $elementData.value + '"]').removeAttr('checked');
       }else if(  behaviour == 'checkbox' ){
-
         // Quitamos check
         $($elementData.input + '[value="' + $elementData.value + '"]').prop({
           checked: false
         });
       }
 
-      // Añadimos clase para estado
-      this.$element.removeClass(this.$options.activeClass);
+      // Quitamos clase de estado
+      pluginInstance.$element.removeClass(pluginInstance.$options.activeClass);
+
+      // Añadimos estado al elemento
+      thisInstance.data('status', 'default');
 
       // Ejecutamos callback
-      this.$options.onDeactivate.call(this);
+      pluginInstance.$options.onDeactivate.call(pluginInstance);
+    },
+    toggle: function(){
+
+      var pluginInstance = (this instanceof Button) ? this : $(this).data(storageName);
+      var thisInstance = (this instanceof HTMLElement) ? $(this) : this.$element;
+
+      if(thisInstance.data('status') === 'disabled') return;
+
+      if(pluginInstance.isActive()){
+        pluginInstance.deactivate();
+      }else{
+        pluginInstance.activate();
+      }
+
+    },
+    disable: function(){
+      console.log('Disable method');
+
+      var pluginInstance = (this instanceof Button) ? this : $(this).data(storageName);
+      var thisInstance = (this instanceof HTMLElement) ? $(this) : this.$element;
+
+      // Añadimos clase de estado
+      pluginInstance.$element.addClass(pluginInstance.$options.disableClass);
+
+      thisInstance.data('status', 'disabled');
+
+    },
+    enable: function(){
+      console.log('Enable method');
+
+      var pluginInstance = (this instanceof Button) ? this : $(this).data(storageName);
+      var thisInstance = (this instanceof HTMLElement) ? $(this) : this.$element;
+
+      // Añadimos clase de estado
+      pluginInstance.$element.removeClass(pluginInstance.$options.disableClass);
+
+      thisInstance.removeData('status');
     }
 
   }
