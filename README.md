@@ -1,5 +1,4 @@
-button
-======
+
 
 Simple button jQuery plugin
 
