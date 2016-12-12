@@ -1,17 +1,17 @@
-but1ton11
+button
 ======
-asd
-Sim1ple button jQuery plugin
 
-Plugi11n creado con propósitos didácticos para refrescar conceptos en JS.
+Simple button jQuery plugin
+
+Plugin creado con propósitos didácticos para refrescar conceptos en JS.
 
 
 Parámetros
-==1========
+==========
 onActivate: fn, callback que se ejecuta al evento activate
 
 onDeactivate: fn, callback que se ejecuta al evento deactivate
-1
+
 Eventos (Scope: "button")
 =========================
 
